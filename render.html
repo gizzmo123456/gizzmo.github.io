@@ -1,0 +1,144 @@
+<DOCTYPE html>
+<html>
+	<head>
+		<script src="init.js"></script>
+		
+		<!-- load objects -->
+		<!--<script src="objects/haha.obj.js"></script>
+		<!-- load comps -->
+		<script src="help.js"></script>
+		<script src="camera.js"></script>		
+		<script src="main.js"></script>
+		<script src="events.js"></script>
+		
+	</head>
+	<body>
+	
+	<canvas id="MainCanvas" width="80" height="60" style="border:1px solid #000000;" <!--onMouseMove="UpdateMousePos(event)"-->>
+		Opp's No Canvase For You, Sorry.
+	</canvas>
+	
+	<!-- Debugs -->
+	<div><p><b>Zoom</b><p id="DEBUG_0" style="display:inline;"></p></p></div>
+	<div><p><b>Faces</b><p id="DEBUG_1" style="display:inline;"></p></p></div>
+	<div><p><b>Update Length</b><p id="DEBUG_2" style="display:inline;"></p></p></div>
+	
+	<div style="position:absolute;top:715px;left:800px">
+	<p>Objects<p>
+	<a href="render.html">Square</a><br />
+	<a href="render.html?donut">Donut</a><br />
+	<a href="render.html?ship">Ship</a><br />
+	<a href="render.html?pan">Frying Pan</a><br />
+	<a href="render.html?drag">Dragon</a><br />
+	</div>
+	
+	<script>
+		// init canvas and drawing ect...
+		var doc = document;
+		var canvas = doc.getElementById("MainCanvas");
+		var ctx = canvas.getContext("2d");
+		ctx.fillStyle = "black";
+		//doc.getElementById("DEBUG_1").innerHTML = faces.length;//window.innerWidth-10;
+		
+		canvas.width = width;
+		canvas.height = height;
+		
+		// setup canvas events
+		canvas.addEventListener("wheel", zoom);
+		canvas.addEventListener("mousedown", mouseDown);
+		canvas.addEventListener("mouseup", mouseUp);
+		canvas.addEventListener("mouseout", mouseUp);
+		canvas.addEventListener("mousemove", updateMousePosition);
+		
+		// other
+		var date = new Date();
+		var lastTime = date.getTime()
+		var deltaTime = 0;
+		var newFace = true;
+		
+		var mouse_x = 920, mouse_y = 400;
+		var mouse_rotX = 0, mouse_rotZ = 0;
+		
+		var fps = 0;
+		var fps_interval = 250;
+		var frame_count = 0;
+		var fps_timer = 0;
+		
+		var face_count_set = false;
+		
+		function Update()
+		{
+		
+			if(typeof faces == 'undefined')
+			{
+				return;
+			}
+			else if (!face_count_set)
+			{
+				doc.getElementById("DEBUG_1").innerHTML = faces.length;
+				face_count_set = true;
+			}
+		
+			ctx.clearRect(0, 0, width, height);
+			ctx.strokeStyle = "black";
+			ctx.lineWidth = 1;
+			
+			if (mouseDown && lastMouseButton == 1){ //1 == left mouse button
+				mouse_y += mouseDelta[1];
+				mouse_x += mouseDelta[0];
+			}
+			
+			if (mouseDown && lastMouseButton == 2){ //2 == mid mouse button
+				mouse_rot_y = mouseDelta[1] * 0.01;
+				mouse_rotZ = mouseDelta[0] * 0.01;
+			}
+			
+			
+			
+			for( var f = 0; f < faces.length; f++ )
+			{
+				newFace = true;
+				ctx.beginPath();
+				for( var v = 0; v < faces[f].length; v++ )
+				{
+					//rotate_x(mouseDelta[1]*0.0025, f, v);
+					rotate_x(mouse_rotX, f, v);
+					rotate_y(0.3 * (deltaTime / 1000.0), f, v);
+					rotate_z(mouse_rotZ, f, v);
+					draw(ctx, mouse_x+faces[f][v][0], mouse_y+faces[f][v][1], z_offset+faces[f][v][2], newFace);
+					newFace = false;
+				}
+				ctx.closePath();
+				ctx.stroke();
+			}
+			
+			date = new Date();
+			deltaTime = date.getTime() - lastTime;
+			lastTime = date.getTime();
+			
+			//fps
+			frame_count++;
+			fps_timer += deltaTime;
+			
+			if( fps_timer >= fps_interval )
+			{
+				fps = ( frame_count / (fps_timer/1000) );
+				frame_count = 0;
+				fps_timer = 0;
+			}
+			
+			doc.getElementById("DEBUG_2").innerHTML = deltaTime +"ms"+" ["+fps+"FPS]";
+			drawAxis(8, 2, [mouse_x, mouse_y, z_offset]);
+			
+			clearEvent();
+			
+		}
+		
+		setInterval(Update, 15);
+		
+	</script>
+	
+	
+	
+	</body>
+<html>
